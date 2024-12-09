@@ -8,7 +8,7 @@ It works as follows:
 
 - The behavior for checking the access can be implemented arbitrarily, i.e. variable addresses, global variables, etc.
 
-## How to build
+## Building
 
 Use the `Makefile` and `llvm-18` (later ones might work, but not tested)
 
@@ -16,17 +16,28 @@ Use the `Makefile` and `llvm-18` (later ones might work, but not tested)
 make 
 ```
 
-## How to use
+## Usage
 
 In order to use it (at least with one `.cpp` file) you can:
 
 ```bash
 clang++ -emit-llvm -c target.cpp -o target.ll 
-opt -load-pass-plugin=./global_var_counters.so --passes="global_var_counters" -o instrumented.bc target.ll
+opt -load-pass-plugin=./GlobalAccessInstrumentation.so --passes="global_access_instrumentation" -o instrumented.bc target.ll
 clang++ instrumented.bc -o instrumented_target $(LDFLAGS)
 ```
 
 The function `checkRangeGlob` must be implemented and exist to work properly. 
 Otherwise, the compilation does not succeed.
 
-TODO: Provide `-Xclang` option to adapt existing Builds and files.
+To adapt existing builds and files, you can add a new pass to the `Makefile`:
+
+
+```bash
+CXXPASS=-fpass-plugin=$(BUILD_DIR)/GlobalAccessInstrumentation.so
+
+# Change the CXXFLAGS to include the pass
+CXXFLAGS+= $(CXXPASS)
+
+...
+```
+

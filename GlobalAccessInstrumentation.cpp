@@ -22,7 +22,7 @@ struct GlobalAccessInstrumentation : public PassInfoMixin<GlobalAccessInstrument
   // Main entry point, takes IR unit to run the pass on (&F) and the
   // corresponding pass manager (to be queried if need be)
   PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
-    errs() << "Starting GlobalInstrumentation Pass";
+    outs() << "Running GlobalInstrumentation Pass...\n";
 
     // context and IR builder
     LLVMContext &Context = M.getContext();
@@ -82,10 +82,15 @@ struct GlobalAccessInstrumentation : public PassInfoMixin<GlobalAccessInstrument
 //-----------------------------------------------------------------------------
 llvm::PassPluginLibraryInfo getGlobalAccessInstrumentationPluginInfo() {
   return {LLVM_PLUGIN_API_VERSION, "GlobalAccessInstrumentation", LLVM_VERSION_STRING, [](PassBuilder &PB) {
+            PB.registerPipelineStartEPCallback(
+                [](ModulePassManager &MPM, OptimizationLevel Level) {
+                    MPM.addPass(GlobalAccessInstrumentation());
+                }
+            );
             PB.registerPipelineParsingCallback(
-                [](StringRef Name, ModulePassManager &FPM, ArrayRef<PassBuilder::PipelineElement>) {
-                  if (Name == "global_access_instrumentation") {
-                    FPM.addPass(GlobalAccessInstrumentation());
+                [](StringRef Name, ModulePassManager &MPM, ArrayRef<PassBuilder::PipelineElement>) {
+                  if (Name == "GlobalAccessInstrumentation") {
+                    MPM.addPass(GlobalAccessInstrumentation());
                     return true;
                   }
                   return false;
