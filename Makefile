@@ -5,8 +5,8 @@ CXXFLAGS = $(shell $(LLVM_CONFIG) --cxxflags --ldflags --system-libs --libs core
 					 -fPIC -shared
 
 # Pass source and output
-PASS_SRC = global_var_counters.cpp
-PASS_SO = global_var_counters.so
+PASS_SRC = GlobalAccessInstrumentation.cpp
+PASS_SO = GlobalAccessInstrumentation.so
 
 # Target
 all: $(PASS_SO)
