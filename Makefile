@@ -1,6 +1,6 @@
 # Compiler and flags
-LLVM_CONFIG = llvm-config
-CXX = clang++
+LLVM_CONFIG = llvm-config-18
+CXX = clang++-18
 CXXFLAGS = $(shell $(LLVM_CONFIG) --cxxflags --ldflags --system-libs --libs core passes) \
 					 -fPIC -shared
 
